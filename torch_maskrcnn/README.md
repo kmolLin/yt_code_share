@@ -1,4 +1,4 @@
-# This repository is mainly used to store youtube teaching files.
+# Mask R-CNN with pytorch version example.
 
 ## Please subscribe to my channel
 
