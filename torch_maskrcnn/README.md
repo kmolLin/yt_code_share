@@ -11,6 +11,10 @@
 2. If system is Windows, check install the pycocotools Module.
 3. After training, you can get a stored neural network test.pyh, and then you can run the test show_eample.py to predict the image.
 
+## Train the model
+```sh
+python train.py
+```
 
 ## dataset like
 ```
