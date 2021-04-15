@@ -28,7 +28,8 @@ PennFudanPed/
     FudanPed00004.png
 ```
 
-
+![image](https://github.com/kmolLin/yt_code_share/blob/master/torch_maskrcnn/reference/original.png?raw=true)
+![image](https://github.com/kmolLin/yt_code_share/blob/master/torch_maskrcnn/reference/result.jpg?raw=true)
 
 
 ## Special
