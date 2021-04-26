@@ -46,14 +46,14 @@ def showbbox(model, img):
         ymax = round(prediction[0]['boxes'][i][3].item())
         label = prediction[0]['labels'][i].item()
         mm = mask[i][0]
-        contours, hierarchy = cv2.findContours(mm, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+        # contours, hierarchy = cv2.findContours(mm, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
         # Draw contours:
         if label == 1:
-            cv2.drawContours(img, contours, -1, (0, 255, 0), 1)
+            # cv2.drawContours(img, contours, -1, (0, 255, 0), 1)
             cv2.rectangle(img, (xmin, ymin), (xmax, ymax), (255, 0, 0), 2)
             cv2.putText(img, 'mark_type_1', (xmin, ymin), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 0))
         elif label == 2:
-            cv2.drawContours(img, contours, -1, (0, 0, 255), 1)
+            # cv2.drawContours(img, contours, -1, (0, 0, 255), 1)
             cv2.rectangle(img, (xmin, ymin), (xmax, ymax), (0, 255, 0), 2)
             cv2.putText(img, 'mark_type_2', (xmin, ymin), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0))
 

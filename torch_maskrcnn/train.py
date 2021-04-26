@@ -9,6 +9,7 @@ import utils
 import transforms as T
 from engine import train_one_epoch, evaluate
 import utils
+import cv2
 
 
 class PennFudanDataset(object):
@@ -25,12 +26,19 @@ class PennFudanDataset(object):
         img_path = os.path.join(self.root, "PNGImages", self.imgs[idx])
         mask_path = os.path.join(self.root, "PedMasks", self.masks[idx])
         img = Image.open(img_path).convert("RGB")
+        img = img.resize((512, 512))
         # note that we haven't converted the mask to RGB,
         # because each color corresponds to a different instance
         # with 0 being background
         mask = Image.open(mask_path)
+        mask = mask.resize((512, 512))
         # convert the PIL Image into a numpy array
         mask = np.array(mask)
+
+        # cv2.namedWindow("test", cv2.WINDOW_NORMAL)
+        # cv2.imshow("test", mask * 255)
+        # cv2.waitKey(0)
+        # exit()
         # instances are encoded as different colors
         obj_ids = np.unique(mask)
         # first id is the background, so remove it
@@ -42,6 +50,7 @@ class PennFudanDataset(object):
 
         # get bounding box coordinates for each mask
         num_objs = len(obj_ids)
+        # print(num_objs)
         boxes = []
         for i in range(num_objs):
             pos = np.where(masks[i])
@@ -119,13 +128,13 @@ def main():
     # our dataset has two classes only - background and person
     num_classes = 2
     # use our dataset and defined transformations
-    dataset = PennFudanDataset('PennFudanPed', get_transform(train=True))
-    dataset_test = PennFudanDataset('PennFudanPed', get_transform(train=False))
+    dataset = PennFudanDataset('dataset', get_transform(train=True))
+    dataset_test = PennFudanDataset('dataset', get_transform(train=False))
 
     # split the dataset in train and test set
     indices = torch.randperm(len(dataset)).tolist()
-    dataset = torch.utils.data.Subset(dataset, indices[:-50])
-    dataset_test = torch.utils.data.Subset(dataset_test, indices[-50:])
+    dataset = torch.utils.data.Subset(dataset, indices[:-35])
+    dataset_test = torch.utils.data.Subset(dataset_test, indices[-35:])
 
     # define training and validation data loaders
     data_loader = torch.utils.data.DataLoader(
@@ -145,7 +154,7 @@ def main():
     # construct an optimizer
     params = [p for p in model.parameters() if p.requires_grad]
     optimizer = torch.optim.SGD(params, lr=0.005,
-                                momentum=0.9, weight_decay=0.0005)
+                                momentum=0.85, weight_decay=0.0005)
     # and a learning rate scheduler
     lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer,
                                                    step_size=3,

@@ -14,7 +14,7 @@ import torchvision
 
 
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-path = "image"
+path = "im"
 
 
 def eval_show(img):
@@ -36,10 +36,11 @@ def eval_show(img):
 
 if __name__ == '__main__':
 
-    pa = glob.glob(f"{path}/*.jpg")
+    pa = glob.glob(f"{path}/*.jpeg")
 
     for img_name in pa:
         color_image = cv2.imread(img_name)
+        color_image = cv2.resize(color_image, (512, 512))
 
         image = eval_show(color_image)
 
