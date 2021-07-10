@@ -31,8 +31,8 @@ def image_loader(image_name):
     image = image.unsqueeze(0)
     return image
 
-style_img = image_loader("28.jpg").type(dtype)
-content_img = image_loader("screen_shot.png").type(dtype)
+style_img = image_loader("style11.jpg").type(dtype)
+content_img = image_loader("render2_backup.png").type(dtype)
 print(content_img.size())
 
 unloader = transforms.ToPILImage()  # 转回 PIL 图像
@@ -203,7 +203,7 @@ def get_input_param_optimizer(input_img):
     optimizer = optim.LBFGS([input_param])
     return input_param, optimizer
 
-def run_style_transfer(cnn, content_img, style_img, input_img, num_steps=301,
+def run_style_transfer(cnn, content_img, style_img, input_img, num_steps=601,
                        style_weight=1000, content_weight=1):
     """Run the style transfer."""
     print('Building the style transfer model..')
