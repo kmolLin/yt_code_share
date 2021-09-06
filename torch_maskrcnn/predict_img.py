@@ -7,14 +7,13 @@ import os
 import glob
 from show_example import showbbox
 import torch
-from show_example import showbbox
 from train import get_model_instance_segmentation, get_transform
 import transforms as T
 import torchvision
 
 
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-path = "im"
+path = "image"
 
 
 def eval_show(img):
@@ -36,11 +35,10 @@ def eval_show(img):
 
 if __name__ == '__main__':
 
-    pa = glob.glob(f"{path}/*.jpeg")
+    pa = glob.glob(f"{path}/*.jpg")
 
     for img_name in pa:
         color_image = cv2.imread(img_name)
-        color_image = cv2.resize(color_image, (512, 512))
 
         image = eval_show(color_image)
 

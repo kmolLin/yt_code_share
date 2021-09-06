@@ -26,12 +26,10 @@ class PennFudanDataset(object):
         img_path = os.path.join(self.root, "PNGImages", self.imgs[idx])
         mask_path = os.path.join(self.root, "PedMasks", self.masks[idx])
         img = Image.open(img_path).convert("RGB")
-        img = img.resize((512, 512))
         # note that we haven't converted the mask to RGB,
         # because each color corresponds to a different instance
         # with 0 being background
         mask = Image.open(mask_path)
-        mask = mask.resize((512, 512))
         # convert the PIL Image into a numpy array
         mask = np.array(mask)
 
@@ -128,8 +126,8 @@ def main():
     # our dataset has two classes only - background and person
     num_classes = 2
     # use our dataset and defined transformations
-    dataset = PennFudanDataset('dataset', get_transform(train=True))
-    dataset_test = PennFudanDataset('dataset', get_transform(train=False))
+    dataset = PennFudanDataset('PennFudanPed', get_transform(train=True))
+    dataset_test = PennFudanDataset('PennFudanPed', get_transform(train=False))
 
     # split the dataset in train and test set
     indices = torch.randperm(len(dataset)).tolist()
