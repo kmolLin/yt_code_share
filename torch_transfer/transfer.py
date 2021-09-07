@@ -16,18 +16,18 @@ import copy
 use_cuda = torch.cuda.is_available()
 dtype = torch.cuda.FloatTensor if use_cuda else torch.FloatTensor
 
-# 想要的输出图像尺寸
-imsize = 512 if use_cuda else 128  # 如果没有 GPU 则使用小尺寸
+# 想要的輸出圖像尺寸
+imsize = 512 if use_cuda else 128  # 如果沒有 GPU 則使用小尺寸
 
 loader = transforms.Compose([
-    transforms.Scale((imsize, 512)),  # 缩放图像
-    transforms.ToTensor()])  # 将其转化为 torch 张量
+    transforms.Scale((imsize, 512)),  # 縮放圖像
+    transforms.ToTensor()])  # 將其轉化為 torch 張量
 
 def image_loader(image_name):
     image = Image.open(image_name)
     image = image.convert('RGB')
     image = Variable(loader(image))
-    # 由于神经网络输入的需要, 添加 batch 的维度
+    # 由於身經網路輸入的需要, 增加 batch 維度
     image = image.unsqueeze(0)
     return image
 
@@ -35,18 +35,18 @@ style_img = image_loader("style11.jpg").type(dtype)
 content_img = image_loader("render2_backup.png").type(dtype)
 print(content_img.size())
 
-unloader = transforms.ToPILImage()  # 转回 PIL 图像
+unloader = transforms.ToPILImage()  # 轉回 PIL 圖片
 
 plt.ion()
 
 def imshow(tensor, title=None):
-    image = tensor.clone().cpu()  # 克隆是为了不改变它
+    image = tensor.clone().cpu()  # 複製他是為了不改變
     image = image.view(3, imsize, imsize)  # 移除 batch 维度
     image = unloader(image)
     plt.imshow(image)
     if title is not None:
         plt.title(title)
-    plt.pause(0.001)  # 暂停一会, 让绘图更新
+    plt.pause(0.001)  # 暂停一会, 讓圖片更新
 
 plt.figure()
 imshow(style_img.data, title='Style Image')
@@ -61,10 +61,8 @@ class ContentLoss(nn.Module):
 
     def __init__(self, target, weight):
         super(ContentLoss, self).__init__()
-        # 我们会从所使用的树中“分离”目标内容
         self.target = target.detach() * weight
-        # 动态地计算梯度: 它是个状态值, 不是变量.
-        # 否则评价指标的前向方法会抛出错误.
+        # 動態機算梯度: 它是狀態值, 而不是變量.
         self.weight = weight
         self.criterion = nn.MSELoss()
 
@@ -87,10 +85,9 @@ class GramMatrix(nn.Module):
 
         features = input.view(a * b, c * d)  # 将 F_XL 转换为 \hat F_XL
 
-        G = torch.mm(features, features.t())  # 计算克产物 (gram product)
+        G = torch.mm(features, features.t())
 
-        # 我们用除以每个特征映射元素数量的方法
-            # 标准化克矩阵 (gram matrix) 的值
+        # 標準化矩陣 (gram matrix) 的值
         return G.div(a * b * c * d)
 
 class StyleLoss(nn.Module):
@@ -115,11 +112,11 @@ class StyleLoss(nn.Module):
 
 cnn = models.vgg16(pretrained=True).features
 
-# 可能的话将它移到 GPU 上:
+# 將模型轉移到到 GPU 上:
 if use_cuda:
     cnn = cnn.cuda()
 
-# 希望计算风格/内容损失的层 :
+# 計算風格/内容損失的層數 :
 content_layers_default = ['conv_4']
 style_layers_default = ['conv_1', 'conv_2', 'conv_3', 'conv_4', 'conv_5']
 
@@ -129,14 +126,14 @@ def get_style_model_and_losses(cnn, style_img, content_img,
                                style_layers=style_layers_default):
     cnn = copy.deepcopy(cnn)
 
-    # 仅为了有一个可迭代的列表 内容/风格 损失
+    # 僅為了有一個可叠代的列表 內容/風格 損失
     content_losses = []
     style_losses = []
 
-    model = nn.Sequential()  # 新建的 Sequential 网络模块
-    gram = GramMatrix()  # 我们需要一个克模块 (gram module) 来计算风格目标
+    model = nn.Sequential()  # 新建的 Sequential 網絡模組
+    gram = GramMatrix()  # 我们需要一个gram module (gram module) 來計算風格
 
-    # 可能的话将这些模块移到 GPU 上:
+    # 可能的話將這些模塊移到 GPU 上:
     if use_cuda:
         model = model.cuda()
         gram = gram.cuda()
@@ -148,14 +145,14 @@ def get_style_model_and_losses(cnn, style_img, content_img,
             model.add_module(name, layer)
 
             if name in content_layers:
-                # 加内容损失:
+                # 加內容損失:
                 target = model(content_img).clone()
                 content_loss = ContentLoss(target, content_weight)
                 model.add_module("content_loss_" + str(i), content_loss)
                 content_losses.append(content_loss)
 
             if name in style_layers:
-                # 加风格损失:
+                # 加風格損失:
                 target_feature = model(style_img).clone()
                 target_feature_gram = gram(target_feature)
                 style_loss = StyleLoss(target_feature_gram, style_weight)
@@ -167,14 +164,14 @@ def get_style_model_and_losses(cnn, style_img, content_img,
             model.add_module(name, layer)
 
             if name in content_layers:
-                # 加内容损失:
+                # 加內容損失:
                 target = model(content_img).clone()
                 content_loss = ContentLoss(target, content_weight)
                 model.add_module("content_loss_" + str(i), content_loss)
                 content_losses.append(content_loss)
 
             if name in style_layers:
-                # 加风格损失:
+                # 加風格損失:
                 target_feature = model(style_img).clone()
                 target_feature_gram = gram(target_feature)
                 style_loss = StyleLoss(target_feature_gram, style_weight)
@@ -190,15 +187,15 @@ def get_style_model_and_losses(cnn, style_img, content_img,
     return model, style_losses, content_losses
 
 input_img = content_img.clone()
-# 如果你想用白噪声做输入, 请取消下面的注释行:
+# 如果你想用白噪聲做輸入, 請取消下面的注釋行:
 # input_img = Variable(torch.randn(content_img.data.size())).type(dtype)
 
-# 在绘图中加入原始的输入图像:
+# 在繪圖中加入原始的輸入圖像:
 plt.figure()
 imshow(input_img.data, title='Input Image')
 
 def get_input_param_optimizer(input_img):
-    # 这行显示了输入是一个需要梯度计算的参数
+    # 這行顯示了輸入是一個需要梯度計算的參數
     input_param = nn.Parameter(input_img.data)
     optimizer = optim.LBFGS([input_param])
     return input_param, optimizer
@@ -216,7 +213,7 @@ def run_style_transfer(cnn, content_img, style_img, input_img, num_steps=601,
     while run[0] <= num_steps:
 
         def closure():
-            # 校正更新后的输入图像值
+            # 校正更新後的輸入圖像值
             input_param.data.clamp_(0, 1)
 
             optimizer.zero_grad()
@@ -244,7 +241,7 @@ def run_style_transfer(cnn, content_img, style_img, input_img, num_steps=601,
 
         optimizer.step(closure)
 
-    # 最后一次的校正...
+    # 最後一次的校正...
     input_param.data.clamp_(0, 1)
 
     return input_param.data
